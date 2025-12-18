@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center py-5" style="background: linear-gradient(135deg, #1a237e, #0d47a1); color: white; padding: 80px 0;">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-4">StudyMate</h1>
+        {% comment %} <p class="lead mb-4" style="font-size: 1.5rem;">Engineering Notes Management System</p> {% endcomment %}
+        <p class="mb-5" style="font-size: 1.1rem;">Access all your engineering study materials in one place</p>
+    </div>
+</div>
+
+<!-- Year Cards Section -->
+<div class="container py-5">
+    <div class="row justify-content-center g-4">
+        <!-- 1st Year Card -->
+        <div class="col-md-4 col-lg-2">
+            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #4CAF50, #388E3C); border: none; transform: translateY(0); transition: transform 0.3s ease;">
+                <div class="card-body text-center text-white p-4">
+                    <i class="fas fa-book-open fa-3x mb-3"></i>
+                    <h5 class="card-title mb-3">1st Year</h5>
+                    <a href="{% url 'year_notes' 1 %}" class="btn btn-light w-100">View Notes</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2nd Year Card -->
+        <div class="col-md-4 col-lg-2">
+            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #2196F3, #1976D2); border: none;">
+                <div class="card-body text-center text-white p-4">
+                    <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+                    <h5 class="card-title mb-3">2nd Year</h5>
+                    <a href="{% url 'year_notes' 2 %}" class="btn btn-light w-100">View Notes</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3rd Year Card -->
+        <div class="col-md-4 col-lg-2">
+            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2); border: none;">
+                <div class="card-body text-center text-white p-4">
+                    <i class="fas fa-laptop-code fa-3x mb-3"></i>
+                    <h5 class="card-title mb-3">3rd Year</h5>
+                    <a href="{% url 'year_notes' 3 %}" class="btn btn-light w-100">View Notes</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4th Year Card -->
+        <div class="col-md-4 col-lg-2">
+            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #FF5722, #E64A19); border: none;">
+                <div class="card-body text-center text-white p-4">
+                    <i class="fas fa-user-graduate fa-3x mb-3"></i>
+                    <h5 class="card-title mb-3">4th Year</h5>
+                    <a href="{% url 'year_notes' 4 %}" class="btn btn-light w-100">View Notes</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quantum Card -->
+        <div class="col-md-4 col-lg-2">
+            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #F44336, #D32F2F); border: none;">
+                <div class="card-body text-center text-white p-4">
+                    <i class="fas fa-atom fa-3x mb-3"></i>
+                    <h5 class="card-title mb-3">Quantum</h5>
+                    <a href="{% url 'quantum' %}" class="btn btn-light w-100">View Notes</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-download fa-5x mb-3 text-primary"></i>
+                    <h4>Easy Downloads</h4>
+                    <p>Quick access to all study materials</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-mobile-alt fa-3x mb-3 text-primary"></i>
+                    <h4>Mobile Friendly</h4>
+                    <p>Access notes from any device</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-clock fa-3x mb-3 text-primary"></i>
+                    <h4>24/7 Available</h4>
+                    <p>Access your notes anytime</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">About StudyMate</h5>
+                <p>Your one-stop solution for engineering study materials and notes. Making learning easier and accessible.</p>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'home' %}" class="text-white text-decoration-none">Home</a></li>
+                    <li><a href="{% url 'year_notes' 1 %}" class="text-white text-decoration-none">First Year</a></li>
+                    <li><a href="{% url 'year_notes' 2 %}" class="text-white text-decoration-none">Second Year</a></li>
+                    <li><a href="{% url 'year_notes' 3 %}" class="text-white text-decoration-none">Third Year</a></li>
+                    <li><a href="{% url 'year_notes' 4 %}" class="text-white text-decoration-none">Fourth Year</a></li>
+                    <li><a href="{% url 'quantum' %}" class="text-white text-decoration-none">Quantum</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5 class="mb-3">Contact Us</h5>
+                <p><i class="fas fa-envelope me-2"></i> studymate@gmail.com</p>
+                <p><i class="fas fa-phone me-2"></i> +91 739857XXXX</p>
+                <div class="social-links mt-3">
+                    <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4">
+        <div class="text-center">
+            <p class="mb-0">&copy; 2025 StudyMate. Developed by <span class="fw-bold">Abhinav Singh</span></p>
+        </div>
+    </div>
+</footer>
+
+<style>
+    .year-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .year-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('https://source.unsplash.com/random/1920x1080/?education') center/cover;
+        opacity: 0.1;
+    }
+
+    .social-links a {
+        font-size: 1.2rem;
+        transition: color 0.3s ease;
+    }
+
+    .social-links a:hover {
+        color: #007bff !important;
+    }
+</style>
+{% endblock %} 
