@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: studymate
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn studymate.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
