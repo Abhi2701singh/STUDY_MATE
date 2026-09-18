@@ -1,178 +1,327 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}StudyMate - Engineering Notes & Quantum Series{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="hero-section text-center py-5" style="background: linear-gradient(135deg, #1a237e, #0d47a1); color: white; padding: 80px 0;">
+<!-- Modern Hero Section -->
+<section class="hero-wrapper text-center">
     <div class="container">
-        <h1 class="display-3 fw-bold mb-4">StudyMate</h1>
-        {% comment %} <p class="lead mb-4" style="font-size: 1.5rem;">Engineering Notes Management System</p> {% endcomment %}
-        <p class="mb-5" style="font-size: 1.1rem;">Access all your engineering study materials in one place</p>
-    </div>
-</div>
-
-<!-- Year Cards Section -->
-<div class="container py-5">
-    <div class="row justify-content-center g-4">
-        <!-- 1st Year Card -->
-        <div class="col-md-4 col-lg-2">
-            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #4CAF50, #388E3C); border: none; transform: translateY(0); transition: transform 0.3s ease;">
-                <div class="card-body text-center text-white p-4">
-                    <i class="fas fa-book-open fa-3x mb-3"></i>
-                    <h5 class="card-title mb-3">1st Year</h5>
-                    <a href="{% url 'year_notes' 1 %}" class="btn btn-light w-100">View Notes</a>
-                </div>
-            </div>
+        <div class="hero-badge">
+            <i class="fas fa-sparkles text-warning"></i> Free & Verified Study Materials for Engineering
         </div>
+        <h1 class="hero-title">Ace Your Engineering Exams<br>With Curated Notes</h1>
+        <p class="hero-subtitle">
+            Instant access to semester notes, unit-wise chapters, and university Quantum question banks. Organized, high-quality, and completely free.
+        </p>
 
-        <!-- 2nd Year Card -->
-        <div class="col-md-4 col-lg-2">
-            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #2196F3, #1976D2); border: none;">
-                <div class="card-body text-center text-white p-4">
-                    <i class="fas fa-graduation-cap fa-3x mb-3"></i>
-                    <h5 class="card-title mb-3">2nd Year</h5>
-                    <a href="{% url 'year_notes' 2 %}" class="btn btn-light w-100">View Notes</a>
-                </div>
+        <!-- Search Bar -->
+        <form method="get" action="{% url 'home' %}#search-section" class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search text-muted fs-5"></i>
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Search by subject, chapter, or note title (e.g. Compiler, Python)..." autocomplete="off">
+                {% if search_query %}
+                    <a href="{% url 'home' %}" class="btn btn-sm btn-light rounded-circle me-2 text-muted" title="Clear search">
+                        <i class="fas fa-times"></i>
+                    </a>
+                {% endif %}
+                <button type="submit">
+                    <span>Search</span>
+                    <i class="fas fa-arrow-right fs-6"></i>
+                </button>
             </div>
-        </div>
+        </form>
 
-        <!-- 3rd Year Card -->
-        <div class="col-md-4 col-lg-2">
-            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2); border: none;">
-                <div class="card-body text-center text-white p-4">
-                    <i class="fas fa-laptop-code fa-3x mb-3"></i>
-                    <h5 class="card-title mb-3">3rd Year</h5>
-                    <a href="{% url 'year_notes' 3 %}" class="btn btn-light w-100">View Notes</a>
-                </div>
+        <!-- Stats Row -->
+        <div class="hero-stats-row">
+            <div class="stat-item">
+                <span class="stat-num">{{ total_notes }}</span>
+                <span class="stat-label">Total Notes</span>
             </div>
-        </div>
-
-        <!-- 4th Year Card -->
-        <div class="col-md-4 col-lg-2">
-            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #FF5722, #E64A19); border: none;">
-                <div class="card-body text-center text-white p-4">
-                    <i class="fas fa-user-graduate fa-3x mb-3"></i>
-                    <h5 class="card-title mb-3">4th Year</h5>
-                    <a href="{% url 'year_notes' 4 %}" class="btn btn-light w-100">View Notes</a>
-                </div>
+            <div class="stat-item">
+                <span class="stat-num">{{ total_subjects }}</span>
+                <span class="stat-label">Subjects</span>
             </div>
-        </div>
-
-        <!-- Quantum Card -->
-        <div class="col-md-4 col-lg-2">
-            <div class="card h-100 year-card" style="background: linear-gradient(135deg, #F44336, #D32F2F); border: none;">
-                <div class="card-body text-center text-white p-4">
-                    <i class="fas fa-atom fa-3x mb-3"></i>
-                    <h5 class="card-title mb-3">Quantum</h5>
-                    <a href="{% url 'quantum' %}" class="btn btn-light w-100">View Notes</a>
-                </div>
+            <div class="stat-item">
+                <span class="stat-num">4</span>
+                <span class="stat-label">Academic Years</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">{{ quantum_stats.notes_count }}</span>
+                <span class="stat-label">Quantum Series</span>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Features Section -->
-<div class="bg-light py-5">
+<!-- Search Results Section (if search performed) -->
+{% if search_query %}
+<div id="search-section" class="container py-5">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h3 class="fw-bold mb-1">Search Results</h3>
+            <p class="text-muted mb-0">Showing matches for "<strong>{{ search_query }}</strong>"</p>
+        </div>
+        <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+            <i class="fas fa-times me-1"></i> Clear Search
+        </a>
+    </div>
+
+    {% if search_results %}
+        <div class="row g-4">
+            {% for note in search_results %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="note-card-modern">
+                        <div class="note-card-header">
+                            <div class="file-type-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="note-header-text">
+                                <h5 class="note-title-heading" title="{{ note.title }}">{{ note.title }}</h5>
+                                <div class="note-meta-pills">
+                                    <span class="pill-subject">{{ note.chapter.subject.name }}</span>
+                                    <span class="pill-chapter">{{ note.chapter.name }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="note-card-body">
+                            <div class="note-upload-info">
+                                <i class="far fa-calendar-alt me-1"></i> {{ note.upload_date|date:"d M Y" }}
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{{ note.file.url }}" class="btn-download-modern" download>
+                                    <i class="fas fa-download"></i> Get Note
+                                </a>
+                                {% if request.user.is_staff %}
+                                    <a href="{% url 'delete_note' note.id %}" class="btn-delete-badge" onclick="return confirm('Delete this note?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5 bg-white rounded-4 border">
+            <i class="fas fa-search fa-3x text-muted mb-3 opacity-50"></i>
+            <h4 class="fw-bold text-secondary">No matching notes found</h4>
+            <p class="text-muted mb-4">Try searching with a different keyword or browse through academic years below.</p>
+            <a href="{% url 'home' %}" class="btn btn-primary rounded-pill px-4">Browse All Materials</a>
+        </div>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Academic Years & Quantum Cards Section -->
+<section class="py-5">
     <div class="container">
+        <div class="text-center mb-5">
+            <h6 class="text-primary fw-bold text-uppercase letter-spacing-1">Curriculum</h6>
+            <h2 class="fw-bold display-6">Choose Your Academic Year</h2>
+            <p class="text-muted">Select your branch year to access subject-wise lecture notes, units, and syllabus.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <!-- 1st Year -->
+            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                <div class="year-card-modern year-1">
+                    <div>
+                        <div class="year-icon-wrapper">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <h4 class="year-card-title">1st Year</h4>
+                        <div class="year-card-meta">
+                            <span>{{ year_stats.1.subjects_count }} Subjects</span> • 
+                            <span>{{ year_stats.1.notes_count }} Notes</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'year_notes' 1 %}" class="btn-year-action">
+                        View Notes <i class="fas fa-chevron-right ms-1 small"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2nd Year -->
+            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                <div class="year-card-modern year-2">
+                    <div>
+                        <div class="year-icon-wrapper">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <h4 class="year-card-title">2nd Year</h4>
+                        <div class="year-card-meta">
+                            <span>{{ year_stats.2.subjects_count }} Subjects</span> • 
+                            <span>{{ year_stats.2.notes_count }} Notes</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'year_notes' 2 %}" class="btn-year-action">
+                        View Notes <i class="fas fa-chevron-right ms-1 small"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 3rd Year -->
+            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                <div class="year-card-modern year-3">
+                    <div>
+                        <div class="year-icon-wrapper">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <h4 class="year-card-title">3rd Year</h4>
+                        <div class="year-card-meta">
+                            <span>{{ year_stats.3.subjects_count }} Subjects</span> • 
+                            <span>{{ year_stats.3.notes_count }} Notes</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'year_notes' 3 %}" class="btn-year-action">
+                        View Notes <i class="fas fa-chevron-right ms-1 small"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4th Year -->
+            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                <div class="year-card-modern year-4">
+                    <div>
+                        <div class="year-icon-wrapper">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <h4 class="year-card-title">4th Year</h4>
+                        <div class="year-card-meta">
+                            <span>{{ year_stats.4.subjects_count }} Subjects</span> • 
+                            <span>{{ year_stats.4.notes_count }} Notes</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'year_notes' 4 %}" class="btn-year-action">
+                        View Notes <i class="fas fa-chevron-right ms-1 small"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quantum Series -->
+            <div class="col-xl-2 col-lg-4 col-md-6 col-sm-6">
+                <div class="year-card-modern quantum">
+                    <div>
+                        <div class="year-icon-wrapper">
+                            <i class="fas fa-atom"></i>
+                        </div>
+                        <h4 class="year-card-title">Quantum</h4>
+                        <div class="year-card-meta">
+                            <span>{{ quantum_stats.subjects_count }} Series</span> • 
+                            <span>{{ quantum_stats.notes_count }} Notes</span>
+                        </div>
+                    </div>
+                    <a href="{% url 'quantum' %}" class="btn-year-action">
+                        Quantum Series <i class="fas fa-chevron-right ms-1 small"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Uploads Section -->
+<section id="recent-notes" class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+            <div>
+                <h6 class="text-primary fw-bold text-uppercase letter-spacing-1">Fresh Content</h6>
+                <h2 class="fw-bold mb-0">Recently Uploaded Notes</h2>
+            </div>
+            {% if user.is_staff %}
+                <a href="{% url 'add_note' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    <i class="fas fa-plus me-1"></i> Add New Note
+                </a>
+            {% endif %}
+        </div>
+
+        {% if recent_notes %}
+            <div class="row g-4">
+                {% for note in recent_notes %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="note-card-modern">
+                            <div class="note-card-header">
+                                <div class="file-type-icon">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="note-header-text">
+                                    <h5 class="note-title-heading" title="{{ note.title }}">{{ note.title }}</h5>
+                                    <div class="note-meta-pills">
+                                        <span class="pill-subject">{{ note.chapter.subject.name }} (Yr {{ note.chapter.subject.year }})</span>
+                                        <span class="pill-chapter">{{ note.chapter.name }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="note-card-body">
+                                <div class="note-upload-info">
+                                    <i class="far fa-clock me-1"></i> {{ note.upload_date|date:"d M Y" }}
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <a href="{{ note.file.url }}" class="btn-download-modern" download>
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                    {% if request.user.is_staff %}
+                                        <a href="{% url 'delete_note' note.id %}" class="btn-delete-badge" onclick="return confirm('Delete this note?')">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-folder-open fa-3x text-muted mb-3 opacity-50"></i>
+                <h5 class="text-muted">No notes have been uploaded yet.</h5>
+                {% if user.is_staff %}
+                    <a href="{% url 'add_note' %}" class="btn btn-primary rounded-pill mt-3">Upload the First Note</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Features Highlights -->
+<section class="py-5 bg-surface-alt">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h6 class="text-primary fw-bold text-uppercase letter-spacing-1">Why StudyMate</h6>
+            <h2 class="fw-bold">Built Specifically For Engineering Success</h2>
+        </div>
+
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="text-center">
-                    <i class="fas fa-download fa-5x mb-3 text-primary"></i>
-                    <h4>Easy Downloads</h4>
-                    <p>Quick access to all study materials</p>
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4>Instant Free Downloads</h4>
+                    <p>No ads, no paywalls, no wait times. Click download and start studying directly from your browser or device.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="text-center">
-                    <i class="fas fa-mobile-alt fa-3x mb-3 text-primary"></i>
-                    <h4>Mobile Friendly</h4>
-                    <p>Access notes from any device</p>
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <h4>Unit & Chapter Organized</h4>
+                    <p>Notes are neatly categorized according to university syllabus by year, subject, and unit chapters.</p>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="text-center">
-                    <i class="fas fa-clock fa-3x mb-3 text-primary"></i>
-                    <h4>24/7 Available</h4>
-                    <p>Access your notes anytime</p>
+                <div class="feature-box">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h4>Any Device Friendly</h4>
+                    <p>Responsive design for smartphones, tablets, and laptops. Revise before exams on the go with zero hassle.</p>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<!-- Footer -->
-<footer class="bg-dark text-white py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <h5 class="mb-3">About StudyMate</h5>
-                <p>Your one-stop solution for engineering study materials and notes. Making learning easier and accessible.</p>
-            </div>
-            <div class="col-md-4 mb-4">
-                <h5 class="mb-3">Quick Links</h5>
-                <ul class="list-unstyled">
-                    <li><a href="{% url 'home' %}" class="text-white text-decoration-none">Home</a></li>
-                    <li><a href="{% url 'year_notes' 1 %}" class="text-white text-decoration-none">First Year</a></li>
-                    <li><a href="{% url 'year_notes' 2 %}" class="text-white text-decoration-none">Second Year</a></li>
-                    <li><a href="{% url 'year_notes' 3 %}" class="text-white text-decoration-none">Third Year</a></li>
-                    <li><a href="{% url 'year_notes' 4 %}" class="text-white text-decoration-none">Fourth Year</a></li>
-                    <li><a href="{% url 'quantum' %}" class="text-white text-decoration-none">Quantum</a></li>
-                </ul>
-            </div>
-            <div class="col-md-4 mb-4">
-                <h5 class="mb-3">Contact Us</h5>
-                <p><i class="fas fa-envelope me-2"></i> studymate@gmail.com</p>
-                <p><i class="fas fa-phone me-2"></i> +91 739857XXXX</p>
-                <div class="social-links mt-3">
-                    <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
-                </div>
-            </div>
-        </div>
-        <hr class="my-4">
-        <div class="text-center">
-            <p class="mb-0">&copy; 2025 StudyMate. Developed by <span class="fw-bold">Abhinav Singh</span></p>
-        </div>
-    </div>
-</footer>
-
-<style>
-    .year-card {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .year-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .hero-section {
-        position: relative;
-        overflow: hidden;
-    }
-
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url('https://source.unsplash.com/random/1920x1080/?education') center/cover;
-        opacity: 0.1;
-    }
-
-    .social-links a {
-        font-size: 1.2rem;
-        transition: color 0.3s ease;
-    }
-
-    .social-links a:hover {
-        color: #007bff !important;
-    }
-</style>
-{% endblock %} 
+</section>
+{% endblock %}
+ 

@@ -1,57 +1,262 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if is_quantum %}Add Quantum Note{% else %}Add Note{% endif %}{% endblock %}
+{% block title %}{% if is_quantum %}Upload Quantum Series{% else %}Upload Lecture Note{% endif %} - Admin{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="mb-0">{% if is_quantum %}Add New Quantum Note{% else %}Add New Note{% endif %}</h3>
+        <div class="col-lg-8 col-md-10">
+            <!-- Header Card with Switcher -->
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                <div>
+                    <h2 class="fw-bold mb-1">
+                        {% if is_quantum %}
+                            <i class="fas fa-atom text-danger me-2"></i>Upload Quantum Note
+                        {% else %}
+                            <i class="fas fa-cloud-upload-alt text-primary me-2"></i>Quick Upload Note
+                        {% endif %}
+                    </h2>
+                    <p class="text-muted mb-0">Select subject and chapter in 2 clicks, or create new ones on the fly.</p>
                 </div>
-                <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
+                <div>
+                    {% if is_quantum %}
+                        <a href="{% url 'add_note' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                            <i class="fas fa-book me-1"></i> Switch to Regular Notes
+                        </a>
+                    {% else %}
+                        <a href="{% url 'add_quantum_note' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                            <i class="fas fa-atom me-1"></i> Switch to Quantum
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Main Form Card -->
+            <div class="form-card">
+                <div class="form-card-header d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="fw-bold mb-1 text-white">Study Material Information</h4>
+                        <small class="text-light opacity-75">Fill in the note details below</small>
+                    </div>
+                    <span class="badge bg-primary px-3 py-2 rounded-pill">Admin Mode</span>
+                </div>
+
+                <div class="form-card-body">
+                    <form method="post" enctype="multipart/form-data" id="upload-note-form">
                         {% csrf_token %}
                         <input type="hidden" name="is_quantum" value="{{ is_quantum|yesno:'true,false' }}">
-                        <div class="mb-3">
-                            <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" required>
+
+                        <!-- 1. Note Title -->
+                        <div class="mb-4">
+                            <label for="title" class="form-label-modern">
+                                <span>Note Title <span class="text-danger">*</span></span>
+                                <small class="text-muted">e.g. Unit 1: Lexical Analysis</small>
+                            </label>
+                            <input type="text" class="form-control-modern" id="title" name="title" placeholder="Enter clear, descriptive note title..." required autofocus>
                         </div>
-                        <div class="mb-3">
-                            <label for="year" class="form-label">Year</label>
-                            <select class="form-select" id="year" name="year" required>
-                                <option value="1">1st Year</option>
-                                <option value="2">2nd Year</option>
-                                <option value="3">3rd Year</option>
-                                <option value="4">4th Year</option>
-                            </select>
+
+                        <!-- 2. Subject Selection -->
+                        <div class="p-3 mb-4 rounded-3 border bg-light">
+                            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                <label class="fw-bold text-dark mb-0">
+                                    <i class="fas fa-book-open text-primary me-1"></i> Subject & Year <span class="text-danger">*</span>
+                                </label>
+                                <!-- Mode Selector: Existing vs New -->
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <input type="radio" class="btn-check" name="subject_mode" id="sub_mode_existing" value="existing" {% if existing_subjects %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary" for="sub_mode_existing">
+                                        <i class="fas fa-list me-1"></i> Choose Existing
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="subject_mode" id="sub_mode_new" value="new" {% if not existing_subjects %}checked{% endif %}>
+                                    <label class="btn btn-outline-primary" for="sub_mode_new">
+                                        <i class="fas fa-plus me-1"></i> Create New
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Existing Subject Dropdown -->
+                            <div id="existing-subject-box" {% if not existing_subjects %}style="display: none;"{% endif %}>
+                                <select class="form-select-modern" id="subject-select-dropdown" name="subject_id">
+                                    <option value="">-- Select Existing Subject --</option>
+                                    {% for sub in existing_subjects %}
+                                        <option value="{{ sub.id }}">
+                                            {{ sub.name }} (Year {{ sub.year }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted d-block mt-1">Don't see your subject? Click "Create New" above.</small>
+                            </div>
+
+                            <!-- New Subject Input Box -->
+                            <div id="new-subject-box" {% if existing_subjects %}style="display: none;"{% endif %}>
+                                <div class="row g-3">
+                                    <div class="col-md-7">
+                                        <input type="text" class="form-control-modern" id="new_subject_name" name="new_subject_name" placeholder="Enter new subject name (e.g. Computer Networks)">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <select class="form-select-modern" id="year" name="year">
+                                            <option value="1">1st Year</option>
+                                            <option value="2">2nd Year</option>
+                                            <option value="3">3rd Year</option>
+                                            <option value="4">4th Year</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <label class="small text-muted mb-1">Subject Cover Image (Optional):</label>
+                                    <input type="file" class="form-control form-control-sm" name="subject_image" accept="image/*">
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="subject" class="form-label">Subject</label>
-                            <input type="text" class="form-control" id="subject" name="subject" required>
+
+                        <!-- 3. Chapter Selection -->
+                        <div class="p-3 mb-4 rounded-3 border bg-light">
+                            <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                                <label class="fw-bold text-dark mb-0">
+                                    <i class="fas fa-bookmark text-indigo me-1"></i> Chapter / Unit <span class="text-danger">*</span>
+                                </label>
+                                <!-- Mode Selector: Existing vs New -->
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <input type="radio" class="btn-check" name="chapter_mode" id="chap_mode_existing" value="existing" checked>
+                                    <label class="btn btn-outline-secondary" for="chap_mode_existing">
+                                        <i class="fas fa-list me-1"></i> Choose Existing
+                                    </label>
+
+                                    <input type="radio" class="btn-check" name="chapter_mode" id="chap_mode_new" value="new">
+                                    <label class="btn btn-outline-secondary" for="chap_mode_new">
+                                        <i class="fas fa-plus me-1"></i> Create New
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Existing Chapter Dropdown -->
+                            <div id="existing-chapter-box">
+                                <div class="d-flex align-items-center gap-2">
+                                    <select class="form-select-modern" id="chapter-select-dropdown" name="chapter_id" disabled>
+                                        <option value="">-- First Select a Subject Above --</option>
+                                    </select>
+                                    <div id="chapter-loading-indicator" style="display: none;">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                                    </div>
+                                </div>
+                                <small class="text-muted d-block mt-1">Chapters update automatically when you pick a subject.</small>
+                            </div>
+
+                            <!-- New Chapter Input Box -->
+                            <div id="new-chapter-box" style="display: none;">
+                                <input type="text" class="form-control-modern mb-2" id="new_chapter_name" name="new_chapter_name" placeholder="Enter Chapter/Unit name (e.g. Unit 1: Introduction, Chapter 3)">
+                                <label class="small text-muted mb-1">Chapter Icon/Image (Optional):</label>
+                                <input type="file" class="form-control form-control-sm" name="chapter_image" accept="image/*">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="subject_image" class="form-label">Subject Image (Optional)</label>
-                            <input type="file" class="form-control" id="subject_image" name="subject_image" accept="image/*">
+
+                        <!-- 4. File Upload Dropzone -->
+                        <div class="mb-4">
+                            <label class="form-label-modern">
+                                <span>Note Document File <span class="text-danger">*</span></span>
+                                <small class="text-muted">PDF, DOCX, PPTX, or ZIP</small>
+                            </label>
+
+                            <div class="dropzone-container" id="file-dropzone">
+                                <input type="file" id="note-file-input" name="file" required accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.rar,.txt">
+                                <div class="dropzone-icon">
+                                    <i class="fas fa-file-upload"></i>
+                                </div>
+                                <h5 class="fw-bold mb-1">Click to browse or drop file here</h5>
+                                <p class="text-muted small mb-0">Supported formats: PDF, DOCX, PPTX (any size)</p>
+                            </div>
+
+                            <div class="file-selected-indicator" id="selected-file-info">
+                                <i class="fas fa-check-circle text-success fs-5"></i>
+                                <div>
+                                    <strong id="selected-file-name">filename.pdf</strong>
+                                    <span class="text-muted ms-2" id="selected-file-size">(0 KB)</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="chapter" class="form-label">Chapter</label>
-                            <input type="text" class="form-control" id="chapter" name="chapter" required>
+
+                        <!-- Submit Button -->
+                        <div class="mt-4">
+                            <button type="submit" class="btn-primary-modern">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Publish Note to StudyMate</span>
+                            </button>
                         </div>
-                        <div class="mb-3">
-                            <label for="chapter_image" class="form-label">Chapter Image</label>
-                            <input type="file" class="form-control" id="chapter_image" name="chapter_image" accept="image/*">
-                        </div>
-                        <div class="mb-3">
-                            <label for="file" class="form-label">Upload Note File</label>
-                            <input type="file" class="form-control" id="file" name="file" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Upload Note</button>
                     </form>
+                </div>
+            </div>
+
+            <!-- Quick Tips Card -->
+            <div class="mt-4 p-3 rounded-3 border bg-white shadow-sm d-flex align-items-center gap-3">
+                <div class="p-2 bg-primary-light text-primary rounded-circle">
+                    <i class="fas fa-lightbulb fa-lg"></i>
+                </div>
+                <div class="small">
+                    <strong>Admin Tip:</strong> You can also manage or bulk upload notes, edit subjects, and see stats from the <a href="/admin/" target="_blank" class="fw-bold text-primary">StudyMate Admin Portal</a>.
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %} 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Subject Mode Toggle
+    const subExistingRadio = document.getElementById('sub_mode_existing');
+    const subNewRadio = document.getElementById('sub_mode_new');
+    const existingSubBox = document.getElementById('existing-subject-box');
+    const newSubBox = document.getElementById('new-subject-box');
+    const subSelectDropdown = document.getElementById('subject-select-dropdown');
+    const newSubInput = document.getElementById('new_subject_name');
+
+    function updateSubjectMode() {
+        if (subExistingRadio && subExistingRadio.checked) {
+            if (existingSubBox) existingSubBox.style.display = 'block';
+            if (newSubBox) newSubBox.style.display = 'none';
+            if (newSubInput) newSubInput.required = false;
+        } else if (subNewRadio && subNewRadio.checked) {
+            if (existingSubBox) existingSubBox.style.display = 'none';
+            if (newSubBox) newSubBox.style.display = 'block';
+            if (newSubInput) newSubInput.required = true;
+            // Also switch chapter mode to 'new' since a brand new subject has no chapters yet
+            const chapNewRadio = document.getElementById('chap_mode_new');
+            if (chapNewRadio) {
+                chapNewRadio.checked = true;
+                updateChapterMode();
+            }
+        }
+    }
+
+    if (subExistingRadio && subNewRadio) {
+        subExistingRadio.addEventListener('change', updateSubjectMode);
+        subNewRadio.addEventListener('change', updateSubjectMode);
+    }
+
+    // Chapter Mode Toggle
+    const chapExistingRadio = document.getElementById('chap_mode_existing');
+    const chapNewRadio = document.getElementById('chap_mode_new');
+    const existingChapBox = document.getElementById('existing-chapter-box');
+    const newChapBox = document.getElementById('new-chapter-box');
+    const newChapInput = document.getElementById('new_chapter_name');
+
+    function updateChapterMode() {
+        if (chapExistingRadio && chapExistingRadio.checked) {
+            if (existingChapBox) existingChapBox.style.display = 'block';
+            if (newChapBox) newChapBox.style.display = 'none';
+            if (newChapInput) newChapInput.required = false;
+        } else if (chapNewRadio && chapNewRadio.checked) {
+            if (existingChapBox) existingChapBox.style.display = 'none';
+            if (newChapBox) newChapBox.style.display = 'block';
+            if (newChapInput) newChapInput.required = true;
+        }
+    }
+
+    if (chapExistingRadio && chapNewRadio) {
+        chapExistingRadio.addEventListener('change', updateChapterMode);
+        chapNewRadio.addEventListener('change', updateChapterMode);
+    }
+});
+</script>
+{% endblock %}
+ 

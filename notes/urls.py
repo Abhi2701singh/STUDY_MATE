@@ -13,4 +13,5 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('delete-note/<int:note_id>/', views.delete_note, name='delete_note'),
     path('subject/<int:subject_id>/notes/', views.subject_notes, name='subject_notes'),
-] 
+    path('api/chapters/<int:subject_id>/', views.api_get_chapters, name='api_get_chapters'),
+]

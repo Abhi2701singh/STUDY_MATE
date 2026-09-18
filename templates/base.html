@@ -3,79 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyMate - {% block title %}{% endblock %}</title>
+    <title>StudyMate - {% block title %}Engineering Study Notes{% endblock %}</title>
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Modern Stylesheet -->
     <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <!-- Modern Glassmorphism Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-modern">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">StudyMate</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <a class="brand-logo" href="{% url 'home' %}">
+                <span class="brand-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </span>
+                <span>StudyMate</span>
+            </a>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars text-dark"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
+
+            <div class="collapse navbar-collapse" id="mainNavbar">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'year_notes' 1 %}">1st Year</a>
+                        <a class="nav-link-modern {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'year_notes' 2 %}">2nd Year</a>
+                        <a class="nav-link-modern" href="{% url 'year_notes' 1 %}">
+                            <span class="badge bg-success-subtle text-success me-1">1st</span> Year
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'year_notes' 3 %}">3rd Year</a>
+                        <a class="nav-link-modern" href="{% url 'year_notes' 2 %}">
+                            <span class="badge bg-primary-subtle text-primary me-1">2nd</span> Year
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'year_notes' 4 %}">4th Year</a>
+                        <a class="nav-link-modern" href="{% url 'year_notes' 3 %}">
+                            <span class="badge bg-info-subtle text-info me-1">3rd</span> Year
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'quantum' %}">Quantum</a>
+                        <a class="nav-link-modern" href="{% url 'year_notes' 4 %}">
+                            <span class="badge bg-warning-subtle text-warning me-1">4th</span> Year
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link-modern" href="{% url 'quantum' %}">
+                            <i class="fas fa-atom text-danger me-1"></i> Quantum
+                            <span class="quantum-badge-nav ms-1">Special</span>
+                        </a>
                     </li>
                 </ul>
-                <ul class="navbar-nav ms-auto">
+
+                <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
                     {% if user.is_authenticated %}
                         {% if user.is_staff %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="/admin/">Admin Panel</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link btn btn-success text-white me-2" href="{% url 'add_note' %}">Add Note</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link btn btn-warning text-white me-2" href="{% url 'add_quantum_note' %}">Add Quantum</a>
-                            </li>
+                            <a class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 rounded-pill px-3 shadow-sm" href="{% url 'add_note' %}" title="Upload Note">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Upload Note</span>
+                            </a>
+                            <a class="btn btn-sm btn-outline-dark d-inline-flex align-items-center gap-1 rounded-pill px-3" href="/admin/" title="Django Admin">
+                                <i class="fas fa-shield-alt text-primary"></i>
+                                <span>Admin</span>
+                            </a>
                         {% endif %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                        </li>
+                        
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-light rounded-pill border dropdown-toggle d-inline-flex align-items-center gap-2 px-3 py-1" type="button" data-bs-toggle="dropdown">
+                                <span class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 26px; height: 26px; font-size: 11px;">
+                                    {{ user.username|slice:":1"|upper }}
+                                </span>
+                                <span class="fw-semibold text-truncate" style="max-width: 100px;">{{ user.username }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2">
+                                <li class="px-3 py-2 border-bottom text-muted small">
+                                    Signed in as <strong>{{ user.username }}</strong>
+                                </li>
+                                {% if user.is_staff %}
+                                    <li><a class="dropdown-item py-2" href="{% url 'add_note' %}"><i class="fas fa-plus-circle me-2 text-success"></i>Upload Notes</a></li>
+                                    <li><a class="dropdown-item py-2" href="/admin/"><i class="fas fa-cog me-2 text-primary"></i>Admin Portal</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item py-2 text-danger border-0 bg-transparent">
+                                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
-                        </li>
+                        <a class="btn btn-sm btn-light border rounded-pill px-3" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-1 text-muted"></i> Log In
+                        </a>
+                        <a class="btn btn-sm btn-primary rounded-pill px-3" href="{% url 'signup' %}">
+                            Sign Up
+                        </a>
                     {% endif %}
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        {% if messages %}
+    <!-- Global Flash Notification Messages -->
+    {% if messages %}
+        <div class="container mt-3">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show d-flex align-items-center gap-2 rounded-3 shadow-sm" role="alert">
+                    {% if message.tags == 'success' %}
+                        <i class="fas fa-check-circle fa-lg text-success"></i>
+                    {% elif message.tags == 'error' %}
+                        <i class="fas fa-exclamation-circle fa-lg text-danger"></i>
+                    {% else %}
+                        <i class="fas fa-info-circle fa-lg text-info"></i>
+                    {% endif %}
+                    <div class="flex-grow-1">{{ message }}</div>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
-        {% endif %}
-        
+        </div>
+    {% endif %}
+
+    <!-- Main Content Block -->
+    <main>
         {% block content %}
         {% endblock %}
-    </div>
+    </main>
 
+    <!-- Modern Global Footer -->
+    <footer class="footer-modern">
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-brand">
+                        <span class="brand-icon" style="width: 32px; height: 32px; font-size: 0.95rem;">
+                            <i class="fas fa-graduation-cap"></i>
+                        </span>
+                        <span>StudyMate</span>
+                    </div>
+                    <p class="text-secondary small pe-lg-4 mb-4">
+                        Your one-stop community-driven platform for engineering notes, unit questions, and quantum materials. Structured, organized, and available 24/7.
+                    </p>
+                    <div class="d-flex align-items-center">
+                        <a href="#" class="social-pill" title="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-pill" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-pill" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-pill" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="text-white fw-bold mb-3">Academic Years</h6>
+                    <div class="footer-links">
+                        <a href="{% url 'year_notes' 1 %}">1st Year Notes</a>
+                        <a href="{% url 'year_notes' 2 %}">2nd Year Notes</a>
+                        <a href="{% url 'year_notes' 3 %}">3rd Year Notes</a>
+                        <a href="{% url 'year_notes' 4 %}">4th Year Notes</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6 col-6">
+                    <h6 class="text-white fw-bold mb-3">Special Material</h6>
+                    <div class="footer-links">
+                        <a href="{% url 'quantum' %}">Quantum Series</a>
+                        <a href="{% url 'home' %}#recent-notes">Recent Uploads</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'add_note' %}">Upload Note</a>
+                            <a href="/admin/">Admin Console</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="text-white fw-bold mb-3">Need Help or Questions?</h6>
+                    <p class="small text-secondary mb-2">
+                        <i class="fas fa-envelope text-primary me-2"></i> studymate.support@gmail.com
+                    </p>
+                    <p class="small text-secondary mb-3">
+                        <i class="fas fa-shield-alt text-success me-2"></i> Verified Academic Materials
+                    </p>
+                    <div class="p-3 rounded-3" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);">
+                        <small class="text-light d-block mb-1 fw-semibold">Fast Admin Upload</small>
+                        <small class="text-secondary d-block mb-2">Authorized admins can quickly upload and categorize semester notes.</small>
+                        {% if user.is_staff %}
+                            <a href="{% url 'add_note' %}" class="btn btn-sm btn-outline-light rounded-pill px-3">Go to Upload Form</a>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light rounded-pill px-3">Admin Login</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-top border-secondary border-opacity-25 pt-4 d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2">
+                <p class="mb-0 small text-secondary">
+                    &copy; 2026 <strong>StudyMate</strong>. All rights reserved.
+                </p>
+                <p class="mb-0 small text-secondary">
+                    Designed & Built with <i class="fas fa-heart text-danger"></i> for Engineering Students
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Main JS -->
     <script src="/static/js/main.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
-</html> 
+</html>
+ 

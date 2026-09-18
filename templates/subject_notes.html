@@ -1,45 +1,81 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ subject.name }} Notes{% endblock %}
+{% block title %}{{ subject.name }} Notes - StudyMate{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-12 text-center">
-            <h1 class="display-4">{{ subject.name }}</h1>
-            <p class="lead">Available Notes</p>
-        </div>
-    </div>
-
-    <!-- Notes Cards -->
+<section class="page-header-banner text-center">
     <div class="container">
-        <div class="row">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb justify-content-center mb-2">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none">Home</a></li>
+                {% if subject.is_quantum %}
+                    <li class="breadcrumb-item"><a href="{% url 'quantum' %}" class="text-white-50 text-decoration-none">Quantum</a></li>
+                {% else %}
+                    <li class="breadcrumb-item"><a href="{% url 'year_notes' subject.year %}" class="text-white-50 text-decoration-none">Year {{ subject.year }}</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active text-white" aria-current="page">{{ subject.name }}</li>
+            </ol>
+        </nav>
+        <div class="d-inline-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 fw-bold">Year {{ subject.year }}</span>
+            {% if subject.is_quantum %}
+                <span class="badge bg-danger rounded-pill px-3 py-1">Quantum Series</span>
+            {% endif %}
+        </div>
+        <h1 class="display-5 fw-bold mb-2">{{ subject.name }}</h1>
+        <p class="text-light opacity-75 mb-0">{{ notes|length }} Notes & Study Materials Available</p>
+    </div>
+</section>
+
+<div class="container pb-5">
+    {% if notes %}
+        <div class="row g-4">
             {% for note in notes %}
-                <div class="col-md-2 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        {% if note.chapter.image %}
-                            <img src="{{ note.chapter.image.url }}" class="card-img-top" alt="{{ note.title }}">
-                        {% endif %}
-                        <div class="card-body text-center">
-                            <h5 class="card-title">{{ note.title }}</h5>
-                            <p class="card-text small text-muted">{{ note.chapter.name }}</p>
-                            <div class="mt-3">
-                                <a href="{{ note.file.url }}" class="btn btn-primary btn-sm" download>Download</a>
+                <div class="col-xl-3 col-lg-4 col-md-6">
+                    <div class="note-card-modern">
+                        <div class="note-card-header">
+                            <div class="file-type-icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="note-header-text">
+                                <h6 class="note-title-heading" title="{{ note.title }}">{{ note.title }}</h6>
+                                <div class="note-meta-pills">
+                                    <span class="pill-chapter" title="{{ note.chapter.name }}">
+                                        <i class="fas fa-bookmark me-1"></i>{{ note.chapter.name }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="note-card-body">
+                            <div class="note-upload-info">
+                                <i class="far fa-calendar-alt me-1"></i> {{ note.upload_date|date:"d M Y" }}
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{{ note.file.url }}" class="btn-download-modern" download>
+                                    <i class="fas fa-download"></i> Download
+                                </a>
                                 {% if request.user.is_staff %}
-                                    <a href="{% url 'delete_note' note.id %}" class="btn btn-danger btn-sm mt-2">Delete</a>
+                                    <a href="{% url 'delete_note' note.id %}" class="btn-delete-badge" title="Delete Note" onclick="return confirm('Delete this note?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
                                 {% endif %}
                             </div>
                         </div>
-                        <div class="card-footer text-muted small">
-                            Uploaded: {{ note.upload_date|date:"d M Y" }}
-                        </div>
                     </div>
                 </div>
-                {% if forloop.counter|divisibleby:5 and not forloop.last %}
-                    </div><div class="row">
-                {% endif %}
             {% endfor %}
         </div>
-    </div>
+    {% else %}
+        <div class="text-center py-5 bg-white rounded-4 border">
+            <i class="fas fa-folder-open fa-3x text-muted mb-3 opacity-50"></i>
+            <h4 class="fw-bold">No Notes Found for {{ subject.name }}</h4>
+            <p class="text-muted mb-4">No notes have been added under this subject yet.</p>
+            {% if user.is_staff %}
+                <a href="{% url 'add_note' %}" class="btn btn-primary rounded-pill px-4">Upload Note</a>
+            {% else %}
+                <a href="{% url 'home' %}" class="btn btn-outline-primary rounded-pill px-4">Back to Home</a>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
-{% endblock %} 
+{% endblock %}
