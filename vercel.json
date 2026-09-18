@@ -1,0 +1,18 @@
+{
+  "services": {
+    "studymate": {
+      "root": ".",
+      "entrypoint": "studymate/wsgi.py",
+      "buildCommand": "./build.sh"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "studymate"
+      }
+    }
+  ]
+}
